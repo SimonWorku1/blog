@@ -4,8 +4,9 @@ import Article from "./Article"
 import ArticleEntry from "./ArticleEntry"
 import { SignIn, SignOut } from "./Auth"
 import { useAuthentication } from "../services/authService"
-import { fetchArticles, createArticle } from "../services/articleService"
+import { fetchArticles, createArticle, deleteArticle } from "../services/articleService"
 import "./App.css"
+import { deleteArticle as deleteArticleService } from "../services/articleService"
 
 export default function App() {
   const [articles, setArticles] = useState([])
@@ -32,14 +33,24 @@ export default function App() {
       setWriting(false)
     })
   }
+  function deleteArticle(articleId) {
+    deleteArticleService(articleId).then(() => {
+      setArticles(articles.filter((a) => a.id !== articleId))
+      setArticle(null)
+    })
+  }
+  
 
   return (
     <div className="App">
       <header>
-        Blog
-        {user && <button onClick={() => setWriting(true)}>New Article</button>}
-        {!user ? <SignIn /> : <SignOut />}
-      </header>
+  <div className="title">Blogtopia</div>
+
+  <div className="header-right">
+    {user && <button className="button" onClick={() => setWriting(true)}>New Article</button>}
+    {!user ? <SignIn /> : <SignOut />}
+  </div>
+</header>
 
       {!user ? "" : <Nav articles={articles} setArticle={setArticle} />}
 
@@ -48,7 +59,7 @@ export default function App() {
       ) : writing ? (
         <ArticleEntry addArticle={addArticle} />
       ) : (
-        <Article article={article} />
+        <Article article={article} deleteArticle={deleteArticle} />
       )}
     </div>
   )
